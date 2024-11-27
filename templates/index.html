@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kryptoměnový graf</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Kryptoměnový graf</h2>
+
+    <!-- Formulář pro výběr kryptoměny a období -->
+    <form id="cryptoForm" method="GET">
+        <label for="crypto_symbol">Vyber kryptoměnu:</label>
+        <select name="crypto_symbol" id="crypto_symbol" onchange="updateGraph()">
+            <option value="BTC-USD" {% if crypto_symbol == "BTC-USD" %}selected{% endif %}>Bitcoin (BTC)</option>
+            <option value="ETH-USD" {% if crypto_symbol == "ETH-USD" %}selected{% endif %}>Ethereum (ETH)</option>
+            <option value="DOGE-USD" {% if crypto_symbol == "DOGE-USD" %}selected{% endif %}>Dogecoin (DOGE)</option>
+        </select>
+
+        <label for="period">Vyber období:</label>
+        <select name="period" id="period" onchange="updateGraph()">
+            <option value="1d" {% if period == "1d" %}selected{% endif %}>1 den</option>
+            <option value="5d" {% if period == "5d" %}selected{% endif %}>5 dní</option>
+            <option value="1mo" {% if period == "1mo" %}selected{% endif %}>1 měsíc</option>
+            <option value="3mo" {% if period == "3mo" %}selected{% endif %}>3 měsíce</option>
+            <option value="6mo" {% if period == "6mo" %}selected{% endif %}>6 měsíců</option>
+            <option value="1y" {% if period == "1y" %}selected{% endif %}>1 rok</option>
+            <option value="5y" {% if period == "5y" %}selected{% endif %}>5 let</option>
+        </select>
+    </form>
+
+    <!-- Plátno pro graf -->
+    <canvas id="cryptoChart" width="400" height="200"></canvas>
+
+    <script>
+        // Funkce pro automatické odeslání formuláře
+        function updateGraph() {
+            document.getElementById('cryptoForm').submit();
+        }
+
+        // Data přijatá z Flasku
+        const dates = {{ dates | tojson }};
+        const prices = {{ prices | tojson }};
+
+        // Vytvoření grafu
+        new Chart(document.getElementById('cryptoChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: 'Cena (USD)',
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        display: true,
+                        title: { display: true, text: 'Datum a čas' }
+                    },
+                    y: {
+                        display: true,
+                        title: { display: true, text: 'Cena (USD)' },
+                        ticks: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
